@@ -15,15 +15,13 @@ db = Database()
 async def get_analytics():
 	try:
 		stats = db.get_feedback_stats()
-		improvements = []
-		for cat, acc in stats.get("by_category_accuracy", {}).items():
-			if acc < 0.7:
-				improvements.append(f"Improve training data for category '{cat}'")
 		return AnalyticsResponse(
 			total_feedback=stats.get("total_feedback", 0),
-			accuracy=round(stats.get("accuracy", 0.0), 3),
-			by_category_accuracy={k: round(v, 3) for k, v in stats.get("by_category_accuracy", {}).items()},
-			improvement_opportunities=improvements,
+			overall_accuracy=round(stats.get("accuracy", 0.0), 3),
+			category_accuracy={k: round(v, 3) for k, v in stats.get("by_category_accuracy", {}).items()},
+			learning_potential=round(stats.get("learning_potential", 0.0), 3),
+			recent_performance=stats.get("recent_performance", []),
+			feedback_analysis=stats.get("feedback_analysis", {})
 		)
 	except Exception as e:
 		raise HTTPException(status_code=500, detail=str(e))

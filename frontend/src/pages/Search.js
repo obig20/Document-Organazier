@@ -188,7 +188,7 @@ export default function Search() {
       {/* Search Form */}
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
         <form onSubmit={handleSearch}>
-          <div className="flex space-x-4 mb-4">
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mb-4">
             <div className="flex-1 relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -199,20 +199,22 @@ export default function Search() {
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Searching...' : 'Search'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-            >
-              <AdjustmentsHorizontalIcon className="w-5 h-5" />
-            </button>
+            <div className="flex space-x-2">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="flex-1 sm:flex-none px-4 sm:px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+              >
+                {isLoading ? 'Searching...' : 'Search'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="px-3 sm:px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                <AdjustmentsHorizontalIcon className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Advanced Search Options */}

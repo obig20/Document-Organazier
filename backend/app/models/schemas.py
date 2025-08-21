@@ -83,6 +83,8 @@ class DocumentResponse(BaseModel):
     processing_status: DocumentStatus
     metadata: Optional[DocumentMetadata] = None
     content_preview: Optional[str] = None  # First 200 chars of content
+    key_phrases: Optional[List[str]] = None  # Extracted key phrases
+    language_detected: Optional[str] = None  # Detected language
 
 class DocumentDetail(DocumentResponse):
     """Detailed document response with full content"""
@@ -128,9 +130,9 @@ class StatsResponse(BaseModel):
 class FeedbackRequest(BaseModel):
     """User feedback on classification"""
     document_id: int
-    was_correct: bool
-    correct_category: Optional[DocumentCategory] = None
-    notes: Optional[str] = None
+    is_correct: bool
+    corrected_category: Optional[DocumentCategory] = None
+    comments: Optional[str] = None
 
 
 class FeedbackResponse(BaseModel):
@@ -142,6 +144,8 @@ class FeedbackResponse(BaseModel):
 class AnalyticsResponse(BaseModel):
     """Analytics for basic accuracy and trends"""
     total_feedback: int
-    accuracy: float
-    by_category_accuracy: Dict[str, float]
-    improvement_opportunities: List[str]
+    overall_accuracy: float
+    category_accuracy: Dict[str, float]
+    learning_potential: float
+    recent_performance: List[Dict[str, Any]]
+    feedback_analysis: Dict[str, Any]

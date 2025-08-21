@@ -9,7 +9,8 @@ from typing import List, Dict, Any, Optional, Tuple
 import logging
 from datetime import datetime
 
-from app.models.document import Document, DocumentMetadata, SearchResult
+from app.models.document import Document, DocumentMetadata
+from app.models.schemas import SearchResult, DocumentResponse
 from app.core.config import settings
 
 DATABASE_PATH = settings.DATABASE_URL.replace("sqlite:///", "")
@@ -225,7 +226,7 @@ class Database:
             conn.commit()
             return cursor.rowcount > 0
     
-    def search_documents(self, query: str, category: str = None, tags: List[str] = None, 
+    def search_documents(self, query: str = None, category: str = None, status: str = None, tags: List[str] = None, 
                         limit: int = 20, offset: int = 0) -> Tuple[List[SearchResult], int]:
         """Search documents with optional filters"""
         with self._get_connection() as conn:
@@ -239,6 +240,10 @@ class Database:
             if category:
                 sql += ' AND category = ?'
                 params.append(category)
+                
+            if status:
+                sql += ' AND processing_status = ?'
+                params.append(status)
                 
             if tags:
                 for tag in tags:
@@ -267,6 +272,8 @@ class Database:
             count_sql = 'SELECT COUNT(*) as count FROM documents WHERE 1=1'
             if category:
                 count_sql += ' AND category = ?'
+            if status:
+                count_sql += ' AND processing_status = ?'
             if tags:
                 for _ in tags:
                     count_sql += ' AND tags LIKE ?'
@@ -278,15 +285,33 @@ class Database:
             total_count = cursor.fetchone()[0]
             
             # Create search results (for now, simple results without relevance scoring)
-            results = [
-                SearchResult(
-                    document=doc,
+            results = []
+            for doc in documents:
+                # Convert Document to DocumentResponse
+                doc_response = DocumentResponse(
+                    id=doc.id,
+                    filename=doc.filename,
+                    title=doc.title or doc.filename,
+                    category=doc.category or "other",
+                    confidence_score=doc.confidence_score or 0.0,
+                    tags=doc.tags or [],
+                    created_date=doc.created_date or datetime.now(),
+                    updated_date=doc.updated_date or datetime.now(),
+                    is_processed=doc.is_processed or False,
+                    processing_status=doc.processing_status or "pending",
+                    content_preview=doc.content[:200] + "..." if doc.content and len(doc.content) > 200 else doc.content,
+                    metadata=doc.metadata,
+                    key_phrases=doc.tags,  # Use tags as key phrases for now
+                    language_detected=doc.metadata.language_detected if doc.metadata else None
+                )
+                
+                result = SearchResult(
+                    document=doc_response,
                     relevance_score=1.0,  # Placeholder - implement real scoring
                     matched_fields=['content', 'title', 'filename'],
-                    snippet=self._generate_snippet(doc.content, query) if query else doc.content[:200] + '...'
+                    snippet=self._generate_snippet(doc.content, query) if query and doc.content else (doc.content[:200] + '...' if doc.content and len(doc.content) > 200 else doc.content or '')
                 )
-                for doc in documents
-            ]
+                results.append(result)
             
             return results, total_count
     
@@ -354,6 +379,172 @@ class Database:
             cursor.execute('SELECT * FROM documents ORDER BY created_date DESC')
             rows = cursor.fetchall()
             return [self._row_to_document(dict(row)) for row in rows]
+    
+    def get_document_count(self, category: Optional[str] = None, status: Optional[str] = None, search: Optional[str] = None) -> int:
+        """Get total count of documents with optional filtering"""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            
+            query = "SELECT COUNT(*) FROM documents WHERE 1=1"
+            params = []
+            
+            if category:
+                query += " AND category = ?"
+                params.append(category)
+            
+            if status:
+                query += " AND processing_status = ?"
+                params.append(status)
+            
+            if search:
+                query += " AND (filename LIKE ? OR title LIKE ? OR content LIKE ?)"
+                search_term = f"%{search}%"
+                params.extend([search_term, search_term, search_term])
+            
+            cursor.execute(query, params)
+            return cursor.fetchone()[0]
+    
+    def add_feedback(self, document_id: int, was_correct: bool, correct_category: Optional[str] = None, notes: Optional[str] = None):
+        """Add user feedback for a document"""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO feedback (document_id, was_correct, correct_category, notes, created_date)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (document_id, was_correct, correct_category, notes, datetime.now()))
+            conn.commit()
+    
+    def get_feedback_stats(self) -> Dict[str, Any]:
+        """Get feedback statistics for analytics"""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Get total feedback count
+            cursor.execute('SELECT COUNT(*) FROM feedback')
+            total_feedback = cursor.fetchone()[0]
+            
+            if total_feedback == 0:
+                return {
+                    "total_feedback": 0,
+                    "accuracy": 0.0,
+                    "by_category_accuracy": {},
+                    "learning_potential": 0.0,
+                    "recent_performance": [],
+                    "feedback_analysis": {
+                        "correct_classifications": 0,
+                        "incorrect_classifications": 0,
+                        "feedback_rate": 0.0
+                    }
+                }
+            
+            # Get accuracy
+            cursor.execute('SELECT COUNT(*) FROM feedback WHERE was_correct = 1')
+            correct_feedback = cursor.fetchone()[0]
+            accuracy = correct_feedback / total_feedback
+            
+            # Get accuracy by category
+            cursor.execute('''
+                SELECT d.category, 
+                       COUNT(*) as total,
+                       SUM(CASE WHEN f.was_correct = 1 THEN 1 ELSE 0 END) as correct
+                FROM feedback f
+                JOIN documents d ON f.document_id = d.id
+                GROUP BY d.category
+            ''')
+            
+            by_category_accuracy = {}
+            for row in cursor.fetchall():
+                category, total, correct = row
+                by_category_accuracy[category] = correct / total if total > 0 else 0.0
+            
+            # Get recent performance (last 7 days)
+            cursor.execute('''
+                SELECT DATE(f.created_date) as date,
+                       COUNT(*) as total,
+                       SUM(CASE WHEN f.was_correct = 1 THEN 1 ELSE 0 END) as correct
+                FROM feedback f
+                WHERE f.created_date >= datetime('now', '-7 days')
+                GROUP BY DATE(f.created_date)
+                ORDER BY date DESC
+            ''')
+            
+            recent_performance = []
+            for row in cursor.fetchall():
+                date, total, correct = row
+                recent_performance.append({
+                    "date": date,
+                    "documents_processed": total,
+                    "accuracy": correct / total if total > 0 else 0.0
+                })
+            
+            # Calculate learning potential (percentage of incorrect classifications)
+            learning_potential = (total_feedback - correct_feedback) / total_feedback
+            
+            # Feedback analysis
+            feedback_analysis = {
+                "correct_classifications": correct_feedback,
+                "incorrect_classifications": total_feedback - correct_feedback,
+                "feedback_rate": (total_feedback / max(1, self.get_document_count())) * 100
+            }
+            
+            return {
+                "total_feedback": total_feedback,
+                "accuracy": accuracy,
+                "by_category_accuracy": by_category_accuracy,
+                "learning_potential": learning_potential,
+                "recent_performance": recent_performance,
+                "feedback_analysis": feedback_analysis
+            }
+    
+    def get_statistics(self) -> Dict[str, Any]:
+        """Get system statistics"""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Total documents
+            cursor.execute('SELECT COUNT(*) FROM documents')
+            total_documents = cursor.fetchone()[0]
+            
+            # Documents by category
+            cursor.execute('''
+                SELECT category, COUNT(*) as count 
+                FROM documents 
+                GROUP BY category
+            ''')
+            documents_by_category = {row[0]: row[1] for row in cursor.fetchall()}
+            
+            # Documents by status
+            cursor.execute('''
+                SELECT processing_status, COUNT(*) as count 
+                FROM documents 
+                GROUP BY processing_status
+            ''')
+            documents_by_status = {row[0]: row[1] for row in cursor.fetchall()}
+            
+            # Recent uploads (last 7 days)
+            cursor.execute('''
+                SELECT COUNT(*) 
+                FROM documents 
+                WHERE created_date >= datetime('now', '-7 days')
+            ''')
+            recent_uploads = cursor.fetchone()[0]
+            
+            # Calculate storage used (estimate)
+            cursor.execute('''
+                SELECT SUM(LENGTH(content)) as total_size
+                FROM documents
+                WHERE content IS NOT NULL
+            ''')
+            content_size = cursor.fetchone()[0] or 0
+            storage_used_mb = round(content_size / (1024 * 1024), 2)
+            
+            return {
+                "total_documents": total_documents,
+                "documents_by_category": documents_by_category,
+                "documents_by_status": documents_by_status,
+                "storage_used_mb": storage_used_mb,
+                "recent_uploads": recent_uploads
+            }
 
 # Singleton database instance
 db = Database()

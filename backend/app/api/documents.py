@@ -16,12 +16,13 @@ from app.services.document_service import DocumentService
 router = APIRouter()
 document_service = DocumentService()
 
-@router.get("/documents", response_model=List[DocumentResponse])
+@router.get("/documents")
 async def get_documents(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
     category: Optional[DocumentCategory] = None,
-    status: Optional[str] = None
+    status: Optional[str] = None,
+    search: Optional[str] = None
 ):
     """Get list of documents with pagination and filtering"""
     try:
@@ -29,9 +30,25 @@ async def get_documents(
             skip=skip,
             limit=limit,
             category=category.value if category else None,
-            status=status
+            status=status,
+            search=search
         )
-        return documents
+        
+        # Get total count for pagination
+        total_documents = document_service.db.get_document_count(
+            category=category.value if category else None,
+            status=status,
+            search=search
+        )
+        
+        return {
+            "data": documents,
+            "total": total_documents,
+            "skip": skip,
+            "limit": limit,
+            "page": (skip // limit) + 1,
+            "pages": (total_documents + limit - 1) // limit
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -79,11 +96,11 @@ async def download_document(document_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/stats", response_model=StatsResponse)
+@router.get("/stats")
 async def get_statistics():
     """Get system statistics"""
     try:
-        stats = await document_service.get_statistics()
+        stats = document_service.db.get_statistics()
         return stats
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

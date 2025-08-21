@@ -53,6 +53,6 @@ async def get_recent_documents(limit: int = 10):
     """Get recently added documents"""
     try:
         results = await search_service.get_recent_documents(limit=limit)
-        return {"results": results}
+        return {"results": results, "total_count": len(results)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

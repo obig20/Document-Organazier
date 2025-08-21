@@ -81,6 +81,11 @@ const DocumentCard = ({ document, onDelete, onUpdate }) => {
               <span className="text-sm text-gray-500">
                 Confidence: {(document.confidence_score * 100).toFixed(1)}%
               </span>
+              {document.language_detected && (
+                <span className="text-sm text-gray-500">
+                  Language: {document.language_detected}
+                </span>
+              )}
             </div>
             
             {document.content_preview && (
@@ -93,6 +98,25 @@ const DocumentCard = ({ document, onDelete, onUpdate }) => {
               <span>Uploaded: {new Date(document.created_date).toLocaleDateString()}</span>
               <span>Updated: {new Date(document.updated_date).toLocaleDateString()}</span>
             </div>
+            
+            {/* Analysis Information */}
+            {(document.key_phrases && document.key_phrases.length > 0) && (
+              <div className="mt-3">
+                <h4 className="text-xs font-medium text-gray-700 mb-2">Key Phrases:</h4>
+                <div className="flex flex-wrap gap-1">
+                  {document.key_phrases.slice(0, 5).map((phrase, index) => (
+                    <span key={index} className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-100 text-blue-700">
+                      {phrase}
+                    </span>
+                  ))}
+                  {document.key_phrases.length > 5 && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-100 text-blue-700">
+                      +{document.key_phrases.length - 5} more
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
             
             {document.tags && document.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-3">
@@ -227,7 +251,7 @@ export default function Documents() {
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="relative">
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
