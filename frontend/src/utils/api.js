@@ -25,6 +25,15 @@ const apiClient = {
     });
   },
   
+  // New single file upload with immediate processing
+  uploadAndProcessSingle: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/upload/process', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  
   getDocuments: (params = {}) => api.get('/documents', { params }),
   getDocument: (id) => api.get(`/documents/${id}`),
   updateDocument: (id, data) => api.put(`/documents/${id}`, data),
@@ -48,6 +57,12 @@ const apiClient = {
   
   // Upload status
   getUploadStatus: (documentId) => api.get(`/upload/status/${documentId}`),
+  
+  // Feedback
+  submitFeedback: (feedbackData) => api.post('/feedback', feedbackData),
+  
+  // Analytics
+  getAnalytics: () => api.get('/analytics'),
 };
 
 export default apiClient;

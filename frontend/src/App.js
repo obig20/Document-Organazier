@@ -9,6 +9,7 @@ import Upload from './pages/Upload';
 import Documents from './pages/Documents';
 import Search from './pages/Search';
 import DocumentDetail from './pages/DocumentDetail';
+import Analytics from './pages/Analytics';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,6 +32,7 @@ function App() {
               <Route path="/documents" element={<Documents />} />
               <Route path="/documents/:id" element={<DocumentDetail />} />
               <Route path="/search" element={<Search />} />
+              <Route path="/analytics" element={<Analytics />} />
             </Routes>
           </Layout>
           <Toaster position="top-right" />

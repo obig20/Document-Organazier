@@ -14,6 +14,7 @@ const navigation = [
   { name: 'Upload', href: '/upload', icon: CloudArrowUpIcon },
   { name: 'Documents', href: '/documents', icon: DocumentIcon },
   { name: 'Search', href: '/search', icon: MagnifyingGlassIcon },
+  { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
 ];
 
 export default function Layout({ children }) {
