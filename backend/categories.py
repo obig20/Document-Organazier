@@ -1,0 +1,42 @@
+CLASSIFICATION_CATEGORIES = {
+    'am': {
+        'የዜግነት_ምዝገባ': ['ዜግነት', 'መታወቂያ', 'ምዝገባ', 'የመታዋቂያ ቁጥር', 'ስም', 'የትውልድ_ቀን', 'ትውልድ_ቦታ', 'ፎቶ', 'ጣት_ልክ', 'የቤተሰብ_መረጃ'],
+        'የቤተሰብ_ምዝገባ': ['ቤተሰብ', 'አባዎራ', 'የቤት_ቁጥር', 'አባል', 'ክፍለ_ከተማ', 'ወረዳ', 'ዞን', 'ክልል', 'የቤተሰብ_ቁጥር','ብዛት'],
+        'የልደት_ምዝገባ': ['ልደት', 'አዲስ_ልጅ', 'ወላጅ', 'የልደት_ማስረጃ', 'የተወለደበት_ቀን', 'የተወለደበት_ቦታ', 'ሴት_ልጅ', 'ወንድ_ልጅ', 'ወሳኝ_ኩነት', 'የደት_የሚስክር_ወርቀት'],
+        'የሞት_ምዝገባ': ['ሞት', 'የሞተበት_ቀን', 'የሞተበት_ምክንያት', 'የሞት_ማስረጃ', 'መቃብር', 'የቀብር_ፈቃድ','መቃብር'],
+        'የጋብቻ_ምዝገባ': ['ጋብቻ', 'ባለቤት', 'ሚስት', 'የጋብቻ_ማስረጃ', 'ምስክር', 'የጋብቻ_ቀን'],
+        'የፍቺ_መዝገባ': ['ፍቺ', 'የፍቺ_መግለጫ', 'ፍርድ_ቤት', 'የፍቺ_ቀን','የፍቺ_ማስረጃ','ንብረት', 'መካፈል'],
+        'የመሬት_ንብረት': ['መሬት', 'የመሬት_ቁጥር', 'ቲማድ', 'ስፋት', 'ወሰን', 'የመሬት_ማስረጃ', 'የመሬት_ባለቤት', 'ኪራይ'],
+        'የቤት_ንብረት': ['ቤት', 'የቤት_ቁጥር', 'የቤት_ዓይነት', 'ክፍል', 'የቤት_ማስረጃ', 'የቤት_ባለቤት', 'ኪራይ','የቤት_አድራሻ'],
+        'የማኅበራዊ_ድጋፍ': ['ድጋፍ', 'ማኅበራዊ', 'ድሀ', 'አደገኛ', 'ረጅም_እድሜ', 'አካል_ጎዶሎ', 'ምግብ_እርዳታ', 'ገንዘብ_እርዳታ'],
+        'የግብርና_ሰነድ': ['ግብርና', 'ፍራፍሬ', 'አትክልት', 'እንስሳት', 'ዘር', 'ማዳቀል', 'የውሃ_ማጠራቀሚያ','ሰብል','እህል'],
+        'የአገልግሎት_መጠየቂያ': ['አገልግሎት', 'መጠየቂያ', 'መልእክት', 'የተጋለጠ', 'የእውቅና_ፍቃድ', 'የመኖሪያማስረጃ'],
+        'የገቢ_መጠን': ['ገቢ', 'ታክስ', 'ክፍያ', 'ደረሰኝ', 'የገቢ_መጠን', 'የክፍያ_ማስረጃ','ትርፍ','የከሰረ'],
+        'የሕግ_ሰነድ': ['ሕግ', 'ደንብ', 'ቅጣት', 'ፍትሕ', 'ፍርድ_ቤት', 'ክስ', 'ወንጀል', 'የሕግ_ማስረጃ', 'ዳኛ','ጠበቃ','አቃቢህግ','ተካሳሽ'],
+        'የገንዘብ_ሰነድ': ['ገንዘብ', 'ባንክ', 'ብድር', 'አበዳሪ', 'ሒሳብ', 'በጀት', 'ወጪ', 'ገቢ', 'ክፍያ', 'ደረሰኝ', 'የገቢ_መጠን', 'የክፍያ_ማስረጃ'],
+        'የጤና_ሰነድ': ['ጤና', 'ህክምና', 'መድሀኒት', 'ሆስፒታል', 'ዶክተር', 'ህመም', 'ፅዳት','የጤና_ማስርጃ' , 'የጤና_ውጤት','በሽታ'],
+        'የትምህርት_ሰነድ': ['ትምህርት', 'ትምህርት_ቤት', 'ተማሪ', 'መምህር', 'ዲፕሎማ', 'ፈተና','መጽሐፍ','የትምህርት_ማስረጃ', 'የትምህርት_ውጤት', 'የትምህርት_መዝገብ', 'የትምህርት_ክፍያ','ትራንስክርፒት'],
+        'የስራ_ሰነድ': ['ስራ', 'የሰራ_ልምድ', 'ደመወዝ', 'ኩባንያ', 'ቢሮ', 'ሙያ', 'አገልግሎት'],
+        'የሃይማኖት_ሰነድ': ['ሃይማኖት', 'ጸሎት', 'መስጊድ', 'ቤተ_ክርስቲያን', 'እምነት', 'ቅዱስ', 'መጽሐፍ_ቅዱስ']
+    },
+    'en': {
+        'citizen_registration': ['citizen', 'identification', 'registration', 'id', 'name', 'date_of_birth', 'place_of_birth', 'photo', 'fingerprint', 'family_data'],
+        'family_registration': ['family', 'head_of_household', 'house_number', 'kebele', 'sub_city', 'woreda', 'zone', 'region', 'family_id'],
+        'birth_registration': ['birth', 'newborn', 'parent', 'birth_certificate', 'date_of_birth', 'place_of_birth', 'female_child', 'male_child'],
+        'death_registration': ['death', 'date_of_death', 'cause_of_death', 'death_certificate', 'burial', 'burial_permit'],
+        'marriage_registration': ['marriage', 'groom', 'bride', 'marriage_certificate', 'witness', 'marriage_date'],
+        'divorce_registration': ['divorce', 'divorce_decree', 'court', 'divorce_date'],
+        'land_rights': ['land', 'land_number', 'timad', 'area', 'boundary', 'land_certificate', 'land_owner', 'rent'],
+        'housing_rights': ['house', 'house_number', 'house_type', 'room', 'house_certificate', 'house_owner'],
+        'social_support': ['support', 'social', 'poor', 'vulnerable', 'elderly', 'disabled', 'food_aid', 'financial_aid'],
+        'agricultural_document': ['agriculture', 'fruit', 'vegetable', 'livestock', 'seed', 'cultivation', 'water_reservoir'],
+        'service_request': ['service', 'request', 'letter', 'reference', 'certification', 'residence_proof'],
+        'income_statement': ['income', 'tax', 'payment', 'receipt', 'income_statement', 'payment_proof'],
+        'legal_document': ['law', 'rule', 'regulation', 'justice', 'court', 'case', 'crime'],
+        'financial_document': ['finance', 'bank', 'loan', 'debtor', 'account', 'budget', 'expense'],
+        'health_document': ['health', 'medical', 'medicine', 'hospital', 'doctor', 'disease', 'hygiene'],
+        'educational_document': ['education', 'school', 'student', 'teacher', 'diploma', 'exam', 'book'],
+        'work_document': ['work', 'job', 'salary', 'company', 'office', 'profession', 'service'],
+        'religious_document': ['religion', 'prayer', 'mosque', 'church', 'faith', 'saint', 'bible']
+    }
+}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document Classifier Showcase</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Document Classifier Showcase</h1>
+
+    <section>
+      <h2>Classify Text</h2>
+      <textarea id="inputText" rows="6" placeholder="Paste text in Amharic or English..."></textarea>
+      <div class="row">
+        <label for="lang">Language</label>
+        <select id="lang">
+          <option value="auto">auto</option>
+          <option value="am">am</option>
+          <option value="en">en</option>
+        </select>
+        <label for="topk">Top K</label>
+        <input id="topk" type="number" min="1" max="10" value="3" />
+        <button id="classifyBtn">Classify</button>
+      </div>
+      <pre id="classifyResult"></pre>
+    </section>
+
+    <section>
+      <h2>Add Training Keywords</h2>
+      <div class="row">
+        <label for="train-lang">Lang</label>
+        <select id="train-lang">
+          <option value="am">am</option>
+          <option value="en">en</option>
+        </select>
+        <label for="category">Category</label>
+        <input id="category" placeholder="category key" />
+      </div>
+      <textarea id="keywords" rows="3" placeholder="Comma-separated keywords"></textarea>
+      <button id="trainBtn">Add Keywords</button>
+      <pre id="trainResult"></pre>
+    </section>
+
+    <section>
+      <h2>Unsupervised Clustering (demo)</h2>
+      <textarea id="clusterTexts" rows="6" placeholder="One document per line..."></textarea>
+      <div class="row">
+        <label for="clusters">Clusters</label>
+        <input id="clusters" type="number" min="1" max="10" value="3" />
+        <button id="clusterBtn">Cluster</button>
+      </div>
+      <pre id="clusterResult"></pre>
+    </section>
+
+    <section>
+      <h2>Rules</h2>
+      <button id="rulesBtn">Show Current Rules</button>
+      <pre id="rulesResult"></pre>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
